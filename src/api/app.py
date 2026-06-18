@@ -1,4 +1,4 @@
-# Lab 2 buổi chiều: Flask app với /metrics
+# Lab 2 buổi chiều: Flask app với /metrics - Lab 2.2
 import os
 import random
 from flask import Flask, jsonify
