@@ -1,0 +1,26 @@
+# Test hostNetwork: true violation
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-host-network
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-host-network
+  template:
+    metadata:
+      labels:
+        app: test-host-network
+    spec:
+      hostNetwork: true // ❌ VIOLATION: Using host network
+      containers:
+      - name: app
+        image: nginx:1.21
+        resources:
+          limits:
+            cpu: 100m
+            memory: 64Mi
+        securityContext:
+          runAsUser: 1000

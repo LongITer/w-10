@@ -1,0 +1,25 @@
+# Test image :latest violation
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-latest-image
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-latest
+  template:
+    metadata:
+      labels:
+        app: test-latest
+    spec:
+      containers:
+      - name: app
+        image: nginx:latest // ❌ VIOLATION: :latest tag
+        resources:
+          limits:
+            cpu: 100m
+            memory: 64Mi
+        securityContext:
+          runAsUser: 1000

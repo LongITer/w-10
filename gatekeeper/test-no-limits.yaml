@@ -1,0 +1,22 @@
+# Test missing resources.limits violation
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-no-limits
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-no-limits
+  template:
+    metadata:
+      labels:
+        app: test-no-limits
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.21
+        // ❌ VIOLATION: No resources.limits
+        securityContext:
+          runAsUser: 1000
