@@ -12,7 +12,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/w10-api
+  IMAGE_NAME: longiter/w10-api
 
 jobs:
   build-and-push:
