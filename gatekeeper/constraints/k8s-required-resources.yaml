@@ -11,6 +11,7 @@ spec:
         kind: K8sRequiredResources
       validation:
         openAPIV3Schema:
+          type: object
           properties:
             message:
               type: string
@@ -46,6 +47,7 @@ kind: K8sRequiredResources
 metadata:
   name: require-resources-limits
 spec:
+  enforcementAction: deny
   match:
     namespaceSelector:
       matchExpressions:

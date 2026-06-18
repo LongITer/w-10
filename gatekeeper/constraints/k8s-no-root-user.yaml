@@ -11,6 +11,7 @@ spec:
         kind: K8sBlockPrivilegeEscalation
       validation:
         openAPIV3Schema:
+          type: object
           properties:
             message:
               type: string
@@ -41,6 +42,7 @@ kind: K8sBlockPrivilegeEscalation
 metadata:
   name: block-root-user
 spec:
+  enforcementAction: deny
   match:
     namespaceSelector:
       matchExpressions:

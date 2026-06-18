@@ -1,19 +1,3 @@
-# Constraint: Cấm image tag :latest
-# Risk: F-01 - Image tag không xác định phiên bản chính xác
-apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sRequiredLabels
-metadata:
-  name: image-no-latest
-spec:
-  match:
-    namespaceSelector:
-      matchLabels:
-        gatekeeper: "enabled"
-  parameters:
-    labels: ["gatekeeper.sh/image-no-latest"]
-    message: "Images must not use ':latest' tag. Specify exact version tag."
-
----
 # ConstraintTemplate: Block :latest images
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
@@ -26,6 +10,7 @@ spec:
         kind: K8sRequiredImageTag
       validation:
         openAPIV3Schema:
+          type: object
           properties:
             message:
               type: string
@@ -47,3 +32,19 @@ spec:
             endswith(image, ":latest")
             msg := sprintf("Image '%v' uses :latest tag which is not allowed.", [image])
         }
+
+---
+# Constraint: Cấm image tag :latest
+# Risk: F-01 - Image tag không xác định phiên bản chính xác
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredImageTag
+metadata:
+  name: image-no-latest
+spec:
+  enforcementAction: deny
+  match:
+    namespaceSelector:
+      matchLabels:
+        gatekeeper: "enabled"
+  parameters:
+    message: "Images must not use ':latest' tag. Specify exact version tag."
