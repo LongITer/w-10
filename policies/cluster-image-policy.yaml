@@ -1,0 +1,16 @@
+apiVersion: policy.sigstore.dev/v1beta1
+kind: ClusterImagePolicy
+metadata:
+  name: require-cosign-keypair
+spec:
+  mode: enforce
+  images:
+    - glob: ghcr.io/longiter/w10-api*
+  authorities:
+    - name: cosign-authority
+      key:
+        data: |
+          -----BEGIN PUBLIC KEY-----
+          MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE2HBVbk7NQJ4pDljLIA1THyvre3RH
+          Qbc0jY9ndP4Y4+tooMRHcjLttiXI3qbm+/aavG/np8CKDwLNqKJlWrvLSQ==
+          -----END PUBLIC KEY-----

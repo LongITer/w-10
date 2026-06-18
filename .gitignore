@@ -10,3 +10,7 @@ k8s-monitoring/alertmanager-config.yaml
 
 # OS
 .DS_Store
+
+# Cosign secrets & binaries
+cosign.key
+cosign.exe
