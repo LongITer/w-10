@@ -5,6 +5,8 @@ kind: Deployment
 metadata:
   name: test-compliant
   namespace: demo
+  labels:
+    owner: team-default
 spec:
   replicas: 1
   selector:
@@ -14,10 +16,11 @@ spec:
     metadata:
       labels:
         app: test-compliant
+        owner: team-default
     spec:
       containers:
       - name: app
-        image: nginx:1.21  # ✓ Specific version tag (not :latest)
+        image: ghcr.io/Vuong-Bach/w10-api:0.0.1  # ✓ Specific version tag from allowed registry
         resources:
           limits:  # ✓ Has resource limits
             cpu: 100m

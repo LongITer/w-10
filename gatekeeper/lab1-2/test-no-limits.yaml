@@ -17,6 +17,6 @@ spec:
       containers:
       - name: app
         image: nginx:1.21
-        // ❌ VIOLATION: No resources.limits
+        # ❌ VIOLATION: No resources.limits
         securityContext:
           runAsUser: 1000

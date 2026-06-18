@@ -19,22 +19,32 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8srequiredresources
-        
+
+        kind := input.review.kind.kind
+
+        pod_spec := input.review.object.spec {
+            kind != "Deployment"
+        }
+
+        pod_spec := input.review.object.spec.template.spec {
+            kind == "Deployment"
+        }
+
         violation[{"msg": msg}] {
-            container := input.review.object.spec.containers[_]
+            container := pod_spec.containers[_]
             not container.resources.limits
             msg := sprintf("Container '%v' must have resources.limits defined.", [container.name])
         }
-        
+
         violation[{"msg": msg}] {
-            container := input.review.object.spec.containers[_]
+            container := pod_spec.containers[_]
             limits := container.resources.limits
             not limits.cpu
             msg := sprintf("Container '%v' must have CPU limit defined.", [container.name])
         }
-        
+
         violation[{"msg": msg}] {
-            container := input.review.object.spec.containers[_]
+            container := pod_spec.containers[_]
             limits := container.resources.limits
             not limits.memory
             msg := sprintf("Container '%v' must have memory limit defined.", [container.name])

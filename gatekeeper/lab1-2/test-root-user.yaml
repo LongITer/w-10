@@ -1,0 +1,25 @@
+# Test runAsUser: 0 violation
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-root-user
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-root-user
+  template:
+    metadata:
+      labels:
+        app: test-root-user
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.21
+        resources:
+          limits:
+            cpu: 100m
+            memory: 64Mi
+        securityContext:
+          runAsUser: 0 # ❌ VIOLATION: Running as root

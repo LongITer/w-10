@@ -19,10 +19,19 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8sblockhostnetwork
-        
+
+        kind := input.review.kind.kind
+
+        pod_spec := input.review.object.spec {
+            kind != "Deployment"
+        }
+
+        pod_spec := input.review.object.spec.template.spec {
+            kind == "Deployment"
+        }
+
         violation[{"msg": msg}] {
-            spec := input.review.object.spec
-            spec.hostNetwork == true
+            pod_spec.hostNetwork == true
             msg := "Pod is using host network (hostNetwork: true). Pods must use container network namespace."
         }
 

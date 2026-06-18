@@ -14,7 +14,7 @@ spec:
       labels:
         app: test-host-network
     spec:
-      hostNetwork: true // ❌ VIOLATION: Using host network
+      hostNetwork: true # ❌ VIOLATION: Using host network
       containers:
       - name: app
         image: nginx:1.21

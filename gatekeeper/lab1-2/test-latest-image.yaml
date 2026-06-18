@@ -1,25 +1,25 @@
-# Test runAsUser: 0 violation
+# Test image :latest violation
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: test-root-user
+  name: test-latest-image
   namespace: demo
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: test-root-user
+      app: test-latest
   template:
     metadata:
       labels:
-        app: test-root-user
+        app: test-latest
     spec:
       containers:
       - name: app
-        image: nginx:1.21
+        image: nginx:latest # ❌ VIOLATION: :latest tag
         resources:
           limits:
             cpu: 100m
             memory: 64Mi
         securityContext:
-          runAsUser: 0 // ❌ VIOLATION: Running as root
+          runAsUser: 1000

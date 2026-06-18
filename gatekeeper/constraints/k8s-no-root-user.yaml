@@ -19,19 +19,27 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8sblockprivilegeescalation
-        
+
+        kind := input.review.kind.kind
+
+        pod_spec := input.review.object.spec {
+            kind != "Deployment"
+        }
+
+        pod_spec := input.review.object.spec.template.spec {
+            kind == "Deployment"
+        }
+
         violation[{"msg": msg}] {
-            spec := input.review.object.spec
-            container := spec.containers[_]
+            container := pod_spec.containers[_]
             container.securityContext.runAsUser == 0
             msg := sprintf("Container '%v' is running as root (runAsUser: 0). Containers must run as non-root user.", [container.name])
         }
-        
+
         violation[{"msg": msg}] {
-            spec := input.review.object.spec
-            container := spec.containers[_]
+            container := pod_spec.containers[_]
             not container.securityContext.runAsUser
-            spec.securityContext.runAsUser == 0
+            pod_spec.securityContext.runAsUser == 0
             msg := sprintf("Container '%v' inherits pod-level runAsUser: 0 (root). Must specify non-root runAsUser.", [container.name])
         }
 

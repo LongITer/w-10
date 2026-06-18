@@ -1,11 +1,11 @@
-# ArgoCD App: Deploy Gatekeeper Constraints
+# ArgoCD App: Deploy custom Gatekeeper ConstraintTemplate + Constraint
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: gatekeeper-constraints
+  name: gatekeeper-custom
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   project: default
   source:

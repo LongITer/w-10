@@ -1,0 +1,29 @@
+# Test custom policy: valid deployment should pass
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-custom-pass
+  namespace: demo
+  labels:
+    app: test-custom-pass
+    owner: team-a
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: test-custom-pass
+  template:
+    metadata:
+      labels:
+        app: test-custom-pass
+        owner: team-a
+    spec:
+      containers:
+      - name: app
+        image: ghcr.io/Vuong-Bach/w10-api:0.0.1 # ✓ PASS: allowed registry and image version pinned
+        resources:
+          limits:
+            cpu: 100m
+            memory: 64Mi
+        securityContext:
+          runAsUser: 1000

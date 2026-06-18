@@ -18,17 +18,26 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8srequiredimagetag
-        
+
+        kind := input.review.kind.kind
+
+        pod_spec := input.review.object.spec {
+            kind != "Deployment"
+        }
+
+        pod_spec := input.review.object.spec.template.spec {
+            kind == "Deployment"
+        }
+
+        container := pod_spec.containers[_]
+        image := container.image
+
         violation[{"msg": msg}] {
-            container := input.review.object.spec.containers[_]
-            image := container.image
             not regex.match(":.+$", image)
             msg := sprintf("Image '%v' must include a version tag. :latest is not allowed.", [image])
         }
-        
+
         violation[{"msg": msg}] {
-            container := input.review.object.spec.containers[_]
-            image := container.image
             endswith(image, ":latest")
             msg := sprintf("Image '%v' uses :latest tag which is not allowed.", [image])
         }
