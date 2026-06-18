@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/Vuong-Bach/temp.git
+    repoURL: https://github.com/LongITer/w-10.git
     path: argocd/apps
     targetRevision: main
   destination:
