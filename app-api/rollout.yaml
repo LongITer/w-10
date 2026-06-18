@@ -45,6 +45,14 @@ spec:
           limits:
             cpu: 200m
             memory: 128Mi
+        volumeMounts:
+        - name: db-secret-volume
+          mountPath: /etc/secrets
+          readOnly: true
+      volumes:
+      - name: db-secret-volume
+        secret:
+          secretName: db-password-secret
   strategy:
     canary:
       analysis:

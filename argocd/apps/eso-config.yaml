@@ -1,0 +1,23 @@
+# ArgoCD App: Sync ESO configurations (SecretStore + ExternalSecret)
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: eso-config
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/LongITer/w-10.git
+    path: eso
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: demo
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - ServerSideApply=true
