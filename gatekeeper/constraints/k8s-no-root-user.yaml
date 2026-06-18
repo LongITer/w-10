@@ -1,0 +1,52 @@
+# ConstraintTemplate: Block runAsUser: 0 (root)
+# Risk: F-04 - Containers chạy với quyền root
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sblockprivilegeescalation
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sBlockPrivilegeEscalation
+      validation:
+        openAPIV3Schema:
+          properties:
+            message:
+              type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sblockprivilegeescalation
+        
+        violation[{"msg": msg}] {
+            spec := input.review.object.spec
+            container := spec.containers[_]
+            container.securityContext.runAsUser == 0
+            msg := sprintf("Container '%v' is running as root (runAsUser: 0). Containers must run as non-root user.", [container.name])
+        }
+        
+        violation[{"msg": msg}] {
+            spec := input.review.object.spec
+            container := spec.containers[_]
+            not container.securityContext.runAsUser
+            spec.securityContext.runAsUser == 0
+            msg := sprintf("Container '%v' inherits pod-level runAsUser: 0 (root). Must specify non-root runAsUser.", [container.name])
+        }
+
+---
+# Constraint: Enforce non-root user
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sBlockPrivilegeEscalation
+metadata:
+  name: block-root-user
+spec:
+  match:
+    namespaceSelector:
+      matchExpressions:
+      - key: gatekeeper
+        operator: In
+        values: ["enabled"]
+    excludedNamespaces: ["kube-system", "kube-public", "gatekeeper-system"]
+  parameters:
+    message: "Containers must not run as root (runAsUser: 0)"

@@ -3,5 +3,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: demo
+  labels:
+    gatekeeper: "enabled"
   annotations:
     argocd.argoproj.io/sync-wave: "0"

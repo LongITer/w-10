@@ -1,0 +1,57 @@
+# ConstraintTemplate: Require resources.limits
+# Risk: F-02 - Pods không có giới hạn tài nguyên
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiredresources
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredResources
+      validation:
+        openAPIV3Schema:
+          properties:
+            message:
+              type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8srequiredresources
+        
+        violation[{"msg": msg}] {
+            container := input.review.object.spec.containers[_]
+            not container.resources.limits
+            msg := sprintf("Container '%v' must have resources.limits defined.", [container.name])
+        }
+        
+        violation[{"msg": msg}] {
+            container := input.review.object.spec.containers[_]
+            limits := container.resources.limits
+            not limits.cpu
+            msg := sprintf("Container '%v' must have CPU limit defined.", [container.name])
+        }
+        
+        violation[{"msg": msg}] {
+            container := input.review.object.spec.containers[_]
+            limits := container.resources.limits
+            not limits.memory
+            msg := sprintf("Container '%v' must have memory limit defined.", [container.name])
+        }
+
+---
+# Constraint: Enforce resources.limits
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredResources
+metadata:
+  name: require-resources-limits
+spec:
+  match:
+    namespaceSelector:
+      matchExpressions:
+      - key: gatekeeper
+        operator: In
+        values: ["enabled"]
+    excludedNamespaces: ["kube-system", "kube-public", "gatekeeper-system"]
+  parameters:
+    message: "All containers must have resource limits (CPU and memory)"

@@ -1,0 +1,108 @@
+# Test Violation 1: Image tag :latest
+# Expected: BLOCKED by k8s-image-no-latest constraint
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-latest-image
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-latest
+  template:
+    metadata:
+      labels:
+        app: test-latest
+    spec:
+      containers:
+      - name: app
+        image: nginx:latest  # ❌ VIOLATION: :latest tag
+        resources:
+          limits:
+            cpu: 100m
+            memory: 64Mi
+        securityContext:
+          runAsUser: 1000
+
+---
+# Test Violation 2: Missing resources.limits
+# Expected: BLOCKED by require-resources-limits constraint
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-no-limits
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-no-limits
+  template:
+    metadata:
+      labels:
+        app: test-no-limits
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.21
+        # ❌ VIOLATION: No resources.limits
+        securityContext:
+          runAsUser: 1000
+
+---
+# Test Violation 3: Running as root (runAsUser: 0)
+# Expected: BLOCKED by block-root-user constraint
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-root-user
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-root-user
+  template:
+    metadata:
+      labels:
+        app: test-root-user
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.21
+        resources:
+          limits:
+            cpu: 100m
+            memory: 64Mi
+        securityContext:
+          runAsUser: 0  # ❌ VIOLATION: Running as root
+
+---
+# Test Violation 4: Using host network
+# Expected: BLOCKED by block-host-network constraint
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-host-network
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-host-network
+  template:
+    metadata:
+      labels:
+        app: test-host-network
+    spec:
+      hostNetwork: true  # ❌ VIOLATION: Using host network
+      containers:
+      - name: app
+        image: nginx:1.21
+        resources:
+          limits:
+            cpu: 100m
+            memory: 64Mi
+        securityContext:
+          runAsUser: 1000
